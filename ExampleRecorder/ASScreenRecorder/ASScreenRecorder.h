@@ -1,13 +1,16 @@
 //
 //  ASScreenRecorder.h
-//  ScreenRecorder
+//  PrepareLesson
 //
-//  Created by Alan Skipp on 23/04/2014.
-//  Copyright (c) 2014 Alan Skipp. All rights reserved.
+//  Created by yuelixing on 2017/3/10.
+//  Copyright © 2017年 QingGuo. All rights reserved.
 //
 
 #import <Foundation/Foundation.h>
+#import <CoreGraphics/CoreGraphics.h>
+
 typedef void (^VideoCompletionBlock)(void);
+
 @protocol ASScreenRecorderDelegate;
 
 @interface ASScreenRecorder : NSObject
@@ -23,6 +26,8 @@ typedef void (^VideoCompletionBlock)(void);
 + (instancetype)sharedInstance;
 - (BOOL)startRecording;
 - (void)stopRecordingWithCompletion:(VideoCompletionBlock)completionBlock;
+// 检查音频权限
+- (void)checkAudioAuth:(void (^)(BOOL granted))handler;
 @end
 
 

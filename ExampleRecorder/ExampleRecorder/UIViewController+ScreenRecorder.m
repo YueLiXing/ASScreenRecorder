@@ -9,6 +9,7 @@
 #import "UIViewController+ScreenRecorder.h"
 #import "ASScreenRecorder.h"
 #import <AudioToolbox/AudioToolbox.h>
+#import "ASScreenRecordManager.h"
 
 @implementation UIViewController (ScreenRecorder)
 
@@ -20,18 +21,23 @@
     [self.view addGestureRecognizer:tapGesture];
 }
 
-- (void)recorderGesture:(UIGestureRecognizer *)recognizer
-{
-    ASScreenRecorder *recorder = [ASScreenRecorder sharedInstance];
+- (void)recorderGesture:(UIGestureRecognizer *)recognizer {
+    ASScreenRecordManager * manager = [ASScreenRecordManager shareManager];
+    ASScreenRecorder *recorder = manager.recorder;
     
     if (recorder.isRecording) {
-        [recorder stopRecordingWithCompletion:^{
-            NSLog(@"Finished recording");
+        [manager stop:^(NSURL *fileURL) {
+            NSLog(@"输出路径 %@", fileURL);
             [self playEndSound];
         }];
+//        [recorder stopRecordingWithCompletion:^{
+//            NSLog(@"Finished recording");
+//            [self playEndSound];
+//        }];
     } else {
-        [recorder startRecording];
-        NSLog(@"Start recording");
+        [manager startRecoder:[NSString stringWithFormat:@"%d", arc4random()%100]];
+//        [recorder startRecording];
+//        NSLog(@"Start recording");
         [self playStartSound];
     }
 }

@@ -1,15 +1,16 @@
 //
 //  ASScreenRecorder.m
-//  ScreenRecorder
+//  PrepareLesson
 //
-//  Created by Alan Skipp on 23/04/2014.
-//  Copyright (c) 2014 Alan Skipp. All rights reserved.
+//  Created by yuelixing on 2017/3/10.
+//  Copyright © 2017年 QingGuo. All rights reserved.
 //
 
 #import "ASScreenRecorder.h"
 #import <AVFoundation/AVFoundation.h>
 #import <QuartzCore/QuartzCore.h>
 #import <AssetsLibrary/AssetsLibrary.h>
+#import "RecorderManager.h"
 
 @interface ASScreenRecorder()
 @property (strong, nonatomic) AVAssetWriter *videoWriter;
@@ -19,21 +20,41 @@
 @property (strong, nonatomic) NSDictionary *outputBufferPoolAuxAttributes;
 @property (nonatomic) CFTimeInterval firstTimeStamp;
 @property (nonatomic) BOOL isRecording;
+
+@property (nonatomic, copy) NSString * audioPath;
+
+@property (nonatomic, assign) int showRecorde;
+
+// 从下面复制上来的
+@property (nonatomic, retain) dispatch_queue_t render_queue;
+
+@property (nonatomic, retain) dispatch_queue_t append_pixelBuffer_queue;
+@property (nonatomic, retain) dispatch_semaphore_t frameRenderingSemaphore;
+@property (nonatomic, retain) dispatch_semaphore_t pixelAppendSemaphore;
+
+@property (nonatomic, assign) CGSize viewSize;
+@property (nonatomic, assign) CGFloat scale;
+
+@property (nonatomic, assign) CGColorSpaceRef rgbColorSpace;
+@property (nonatomic, assign) CVPixelBufferPoolRef outputBufferPool;
+
+@property (nonatomic, copy) NSString * tempFilePath;
+
 @end
 
 @implementation ASScreenRecorder
-{
-    dispatch_queue_t _render_queue;
-    dispatch_queue_t _append_pixelBuffer_queue;
-    dispatch_semaphore_t _frameRenderingSemaphore;
-    dispatch_semaphore_t _pixelAppendSemaphore;
-    
-    CGSize _viewSize;
-    CGFloat _scale;
-    
-    CGColorSpaceRef _rgbColorSpace;
-    CVPixelBufferPoolRef _outputBufferPool;
-}
+//{
+//    dispatch_queue_t _render_queue;
+//    dispatch_queue_t _append_pixelBuffer_queue;
+//    dispatch_semaphore_t _frameRenderingSemaphore;
+//    dispatch_semaphore_t _pixelAppendSemaphore;
+//    
+//    CGSize _viewSize;
+//    CGFloat _scale;
+//    
+//    CGColorSpaceRef _rgbColorSpace;
+//    CVPixelBufferPoolRef _outputBufferPool;
+//}
 
 #pragma mark - initializers
 
@@ -45,6 +66,17 @@
     });
     return sharedInstance;
 }
+
+- (void)checkAudioAuth:(void (^)(BOOL granted))handler {
+    [AVCaptureDevice requestAccessForMediaType:AVMediaTypeAudio completionHandler:^(BOOL granted) {
+        if (handler) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                handler(granted);
+            });
+        }
+    }];
+}
+
 
 - (instancetype)init
 {
@@ -77,11 +109,14 @@
 
 - (BOOL)startRecording
 {
-    if (!_isRecording) {
+    if (_isRecording == NO) {
         [self setUpWriter];
+        self.showRecorde = 0;
         _isRecording = (_videoWriter.status == AVAssetWriterStatusWriting);
         _displayLink = [CADisplayLink displayLinkWithTarget:self selector:@selector(writeVideoFrame)];
         [_displayLink addToRunLoop:[NSRunLoop mainRunLoop] forMode:NSRunLoopCommonModes];
+        self.audioPath = nil;
+        [[RecorderManager shareManager] startRecordVolumeChange:nil TimeChange:nil];
     }
     return _isRecording;
 }
@@ -89,9 +124,16 @@
 - (void)stopRecordingWithCompletion:(VideoCompletionBlock)completionBlock;
 {
     if (_isRecording) {
-        _isRecording = NO;
-        [_displayLink removeFromRunLoop:[NSRunLoop mainRunLoop] forMode:NSRunLoopCommonModes];
-        [self completeRecordingSession:completionBlock];
+        [self.displayLink invalidate];
+        self.displayLink = nil;
+        [[RecorderManager shareManager] endRecord:^(NSString *filaPath, NSInteger sec) {
+            self.audioPath = filaPath;
+            LxLog(@"%@", filaPath);
+            _isRecording = NO;
+            
+            [_displayLink removeFromRunLoop:[NSRunLoop mainRunLoop] forMode:NSRunLoopCommonModes];
+            [self completeRecordingSession:completionBlock];
+        }];
     }
 }
 
@@ -113,9 +155,14 @@
     
     
     NSError* error = nil;
-    _videoWriter = [[AVAssetWriter alloc] initWithURL:self.videoURL ?: [self tempFileURL]
+    NSURL * tempURL = [self tempFileURL];
+    self.tempFilePath = tempURL.absoluteString;
+    _videoWriter = [[AVAssetWriter alloc] initWithURL:tempURL
                                              fileType:AVFileTypeQuickTimeMovie
                                                 error:&error];
+    if (error) {
+        LogError(@"%@", error);
+    }
     NSParameterAssert(_videoWriter);
     
     NSInteger pixelNumber = _viewSize.width * _viewSize.height * _scale;
@@ -159,10 +206,12 @@
     return videoTransform;
 }
 
-- (NSURL*)tempFileURL
-{
-    NSString *outputPath = [NSHomeDirectory() stringByAppendingPathComponent:@"tmp/screenCapture.mp4"];
-    [self removeTempFilePath:outputPath];
+- (NSURL*)tempFileURL {
+    NSString * string = [NSString stringWithFormat:@"tmp/screenCapture_%.lf.mp4", [NSDate date].timeIntervalSince1970];
+
+    NSString *outputPath = [NSHomeDirectory() stringByAppendingPathComponent:string];
+//    NSString *outputPath = [NSHomeDirectory() stringByAppendingPathComponent:@"tmp/screenCapture.mp4"];
+//    [self removeTempFilePath:outputPath];
     return [NSURL fileURLWithPath:outputPath];
 }
 
@@ -177,8 +226,8 @@
     }
 }
 
-- (void)completeRecordingSession:(VideoCompletionBlock)completionBlock;
-{
+
+- (void)completeRecordingSession:(VideoCompletionBlock)completionBlock {
     dispatch_async(_render_queue, ^{
         dispatch_sync(_append_pixelBuffer_queue, ^{
             
@@ -191,20 +240,27 @@
                         if (completionBlock) completionBlock();
                     });
                 };
+                LxLog(@"开始融合视频和音频");
                 
-                if (self.videoURL) {
-                    completion();
-                } else {
-                    ALAssetsLibrary *library = [[ALAssetsLibrary alloc] init];
-                    [library writeVideoAtPathToSavedPhotosAlbum:_videoWriter.outputURL completionBlock:^(NSURL *assetURL, NSError *error) {
-                        if (error) {
-                            NSLog(@"Error copying video to camera roll:%@", [error localizedDescription]);
-                        } else {
-                            [self removeTempFilePath:_videoWriter.outputURL.path];
-                            completion();
-                        }
-                    }];
-                }
+//                [self mergeVideo:_videoWriter.outputURL.absoluteString andAudio:self.audioPath ExportPath:self.videoURL Compltion:^{
+                    LxLog(@"删除缓存视频文件和音频文件");
+                    [self removeTempFilePath:self.tempFilePath];
+                    [self removeTempFilePath:_videoWriter.outputURL.path];
+                    [self removeTempFilePath:self.audioPath];
+                    dispatch_async(dispatch_get_main_queue(), completion);
+//                }];
+                
+//                [self mergeVideo:_videoWriter.outputURL.absoluteString andAudio:self.audioPath Compltion:^(NSString * exportPath) {
+//                    ALAssetsLibrary *library = [[ALAssetsLibrary alloc] init];
+//                    [library writeVideoAtPathToSavedPhotosAlbum:[NSURL URLWithString:exportPath] completionBlock:^(NSURL *assetURL, NSError *error) {
+//                        NSLog(@"保存融合后的视频 error:%@", error);
+//                    }];
+//                    
+////                    NSCachesDirectory
+////                    [NSFileManager defaultManager] moveItemAtPath:exportPath toPath: error:(NSError * _Nullable __autoreleasing * _Nullable)
+//                    dispatch_async(dispatch_get_main_queue(), completion);
+//                }];
+//
             }];
         });
     });
@@ -217,12 +273,20 @@
     self.videoWriter = nil;
     self.firstTimeStamp = 0;
     self.outputBufferPoolAuxAttributes = nil;
+    self.audioPath = nil;
     CGColorSpaceRelease(_rgbColorSpace);
     CVPixelBufferPoolRelease(_outputBufferPool);
 }
 
-- (void)writeVideoFrame
-{
+- (void)writeVideoFrame {
+    if (self.showRecorde != 0) {
+        self.showRecorde += 1;
+        if (self.showRecorde >= 1) {
+            self.showRecorde = 0;
+            return;
+        }
+    }
+    self.showRecorde += 1;
     // throttle the number of frames to prevent meltdown
     // technique gleaned from Brad Larson's answer here: http://stackoverflow.com/a/5956119
     if (dispatch_semaphore_wait(_frameRenderingSemaphore, DISPATCH_TIME_NOW) != 0) {
@@ -245,13 +309,14 @@
         }
         // draw each window into the context (other windows include UIKeyboard, UIAlert)
         // FIX: UIKeyboard is currently only rendered correctly in portrait orientation
-        dispatch_sync(dispatch_get_main_queue(), ^{
+        
+//        dispatch_sync(dispatch_get_main_queue(), ^{
             UIGraphicsPushContext(bitmapContext); {
                 for (UIWindow *window in [[UIApplication sharedApplication] windows]) {
                     [window drawViewHierarchyInRect:CGRectMake(0, 0, _viewSize.width, _viewSize.height) afterScreenUpdates:NO];
                 }
             } UIGraphicsPopContext();
-        });
+//        });
         
         // append pixelBuffer on a async dispatch_queue, the next frame is rendered whilst this one appends
         // must not overwhelm the queue with pixelBuffers, therefore:
@@ -261,7 +326,7 @@
             dispatch_async(_append_pixelBuffer_queue, ^{
                 BOOL success = [_avAdaptor appendPixelBuffer:pixelBuffer withPresentationTime:time];
                 if (!success) {
-                    NSLog(@"Warning: Unable to write buffer to video");
+                    LxLog(@"Warning: Unable to write buffer to video");
                 }
                 CGContextRelease(bitmapContext);
                 CVPixelBufferUnlockBaseAddress(pixelBuffer, 0);
@@ -297,5 +362,59 @@
     
     return bitmapContext;
 }
+
+- (void)mergeVideo:(NSString *)videoPath andAudio:(NSString *)audioPath ExportPath:(NSURL *) exportURL Compltion:(void(^)())completion {
+    NSURL *audioUrl = [NSURL fileURLWithPath:audioPath];
+    //    NSURL *videoUrl = [NSURL fileURLWithPath:videoPath];
+    NSURL *videoUrl = [NSURL URLWithString:videoPath];
+    
+    AVURLAsset* audioAsset = [[AVURLAsset alloc]initWithURL:audioUrl options:nil];
+    AVURLAsset* videoAsset = [[AVURLAsset alloc]initWithURL:videoUrl options:nil];
+    
+    //混合音乐
+    AVMutableComposition* mixComposition = [AVMutableComposition composition];
+    AVMutableCompositionTrack *compositionCommentaryTrack = [mixComposition addMutableTrackWithMediaType:AVMediaTypeAudio
+                                                                                        preferredTrackID:kCMPersistentTrackID_Invalid];
+    [compositionCommentaryTrack insertTimeRange:CMTimeRangeMake(kCMTimeZero, audioAsset.duration)
+                                        ofTrack:[[audioAsset tracksWithMediaType:AVMediaTypeAudio] objectAtIndex:0]
+                                         atTime:kCMTimeZero error:nil];
+    
+    
+    //混合视频
+    AVMutableCompositionTrack *compositionVideoTrack = [mixComposition addMutableTrackWithMediaType:AVMediaTypeVideo
+                                                                                   preferredTrackID:kCMPersistentTrackID_Invalid];
+    [compositionVideoTrack insertTimeRange:CMTimeRangeMake(kCMTimeZero, videoAsset.duration)
+                                   ofTrack:[[videoAsset tracksWithMediaType:AVMediaTypeVideo] objectAtIndex:0]
+                                    atTime:kCMTimeZero error:nil];
+    AVAssetExportSession* _assetExport = [[AVAssetExportSession alloc] initWithAsset:mixComposition
+                                                                          presetName:AVAssetExportPresetHighestQuality];
+    
+    
+    
+    //保存混合后的文件的过程
+//    NSString* videoName = @"export2.mp4";
+//    NSString *exportPath = [[NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) objectAtIndex:0] stringByAppendingPathComponent:videoName];
+    
+    if ([[NSFileManager defaultManager] fileExistsAtPath:exportURL.absoluteString]) {
+        [[NSFileManager defaultManager] removeItemAtURL:exportURL error:nil];
+    }
+    
+    //    _assetExport.outputFileType = @"com.apple.quicktime-movie";
+    _assetExport.outputFileType = AVFileTypeMPEG4;
+    LxLog(@"file type %@",_assetExport.outputFileType);
+    _assetExport.outputURL = exportURL;
+    _assetExport.shouldOptimizeForNetworkUse = YES;
+    
+    [_assetExport exportAsynchronouslyWithCompletionHandler:^(void) {
+        LxLog(@"完成了");
+        // your completion code here
+        if (completion) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                completion();
+            });
+        }
+    }];
+}
+
 
 @end

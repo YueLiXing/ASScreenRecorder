@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		CDC6F2771E7B8CD9002CCBC1 /* ASScreenRecorder.m in Sources */ = {isa = PBXBuildFile; fileRef = CDC6F2711E7B8CD9002CCBC1 /* ASScreenRecorder.m */; };
+		CDC6F2781E7B8CD9002CCBC1 /* ASScreenRecordManager.m in Sources */ = {isa = PBXBuildFile; fileRef = CDC6F2731E7B8CD9002CCBC1 /* ASScreenRecordManager.m */; };
+		CDC6F2791E7B8CD9002CCBC1 /* RecorderManager.mm in Sources */ = {isa = PBXBuildFile; fileRef = CDC6F2761E7B8CD9002CCBC1 /* RecorderManager.mm */; };
 		E7C0F8E71907F1C6001B7230 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E7C0F8E61907F1C6001B7230 /* Foundation.framework */; };
 		E7C0F8E91907F1C6001B7230 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E7C0F8E81907F1C6001B7230 /* CoreGraphics.framework */; };
 		E7C0F8EB1907F1C6001B7230 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E7C0F8EA1907F1C6001B7230 /* UIKit.framework */; };
@@ -20,7 +23,6 @@
 		E7C0F9091907F1C7001B7230 /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E7C0F9081907F1C7001B7230 /* XCTest.framework */; };
 		E7C0F90A1907F1C7001B7230 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E7C0F8E61907F1C6001B7230 /* Foundation.framework */; };
 		E7C0F90B1907F1C7001B7230 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E7C0F8EA1907F1C6001B7230 /* UIKit.framework */; };
-		E7C0F92D190808D2001B7230 /* ASScreenRecorder.m in Sources */ = {isa = PBXBuildFile; fileRef = E7C0F92C190808D2001B7230 /* ASScreenRecorder.m */; };
 		E7C0F93019081312001B7230 /* UIViewController+ScreenRecorder.m in Sources */ = {isa = PBXBuildFile; fileRef = E7C0F92F19081312001B7230 /* UIViewController+ScreenRecorder.m */; };
 /* End PBXBuildFile section */
 
@@ -35,6 +37,13 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		CDC6F2701E7B8CD9002CCBC1 /* ASScreenRecorder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASScreenRecorder.h; sourceTree = "<group>"; };
+		CDC6F2711E7B8CD9002CCBC1 /* ASScreenRecorder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ASScreenRecorder.m; sourceTree = "<group>"; };
+		CDC6F2721E7B8CD9002CCBC1 /* ASScreenRecordManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASScreenRecordManager.h; sourceTree = "<group>"; };
+		CDC6F2731E7B8CD9002CCBC1 /* ASScreenRecordManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ASScreenRecordManager.m; sourceTree = "<group>"; };
+		CDC6F2751E7B8CD9002CCBC1 /* RecorderManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RecorderManager.h; sourceTree = "<group>"; };
+		CDC6F2761E7B8CD9002CCBC1 /* RecorderManager.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = RecorderManager.mm; sourceTree = "<group>"; };
+		CDC6F27A1E7B8D9E002CCBC1 /* Logger.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Logger.h; sourceTree = "<group>"; };
 		E7C0F8E31907F1C6001B7230 /* ExampleRecorder.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ExampleRecorder.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E7C0F8E61907F1C6001B7230 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		E7C0F8E81907F1C6001B7230 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
@@ -53,8 +62,6 @@
 		E7C0F9011907F1C6001B7230 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		E7C0F9071907F1C7001B7230 /* ExampleRecorderTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ExampleRecorderTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		E7C0F9081907F1C7001B7230 /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
-		E7C0F92B190808D2001B7230 /* ASScreenRecorder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ASScreenRecorder.h; path = ../ASScreenRecorder/ASScreenRecorder.h; sourceTree = "<group>"; };
-		E7C0F92C190808D2001B7230 /* ASScreenRecorder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ASScreenRecorder.m; path = ../ASScreenRecorder/ASScreenRecorder.m; sourceTree = "<group>"; };
 		E7C0F92E19081312001B7230 /* UIViewController+ScreenRecorder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIViewController+ScreenRecorder.h"; sourceTree = "<group>"; };
 		E7C0F92F19081312001B7230 /* UIViewController+ScreenRecorder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIViewController+ScreenRecorder.m"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -83,11 +90,32 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		CDC6F26F1E7B8CD9002CCBC1 /* ASScreenRecorder */ = {
+			isa = PBXGroup;
+			children = (
+				CDC6F2701E7B8CD9002CCBC1 /* ASScreenRecorder.h */,
+				CDC6F2711E7B8CD9002CCBC1 /* ASScreenRecorder.m */,
+				CDC6F2721E7B8CD9002CCBC1 /* ASScreenRecordManager.h */,
+				CDC6F2731E7B8CD9002CCBC1 /* ASScreenRecordManager.m */,
+				CDC6F2741E7B8CD9002CCBC1 /* RecorderManager */,
+			);
+			path = ASScreenRecorder;
+			sourceTree = "<group>";
+		};
+		CDC6F2741E7B8CD9002CCBC1 /* RecorderManager */ = {
+			isa = PBXGroup;
+			children = (
+				CDC6F2751E7B8CD9002CCBC1 /* RecorderManager.h */,
+				CDC6F2761E7B8CD9002CCBC1 /* RecorderManager.mm */,
+			);
+			path = RecorderManager;
+			sourceTree = "<group>";
+		};
 		E7C0F8DA1907F1C6001B7230 = {
 			isa = PBXGroup;
 			children = (
+				CDC6F26F1E7B8CD9002CCBC1 /* ASScreenRecorder */,
 				E7C0F8EC1907F1C6001B7230 /* ExampleRecorder */,
-				E7C0F92A190808C5001B7230 /* Vendor */,
 				E7C0F8E51907F1C6001B7230 /* Frameworks */,
 				E7C0F8E41907F1C6001B7230 /* Products */,
 			);
@@ -116,6 +144,7 @@
 		E7C0F8EC1907F1C6001B7230 /* ExampleRecorder */ = {
 			isa = PBXGroup;
 			children = (
+				CDC6F27A1E7B8D9E002CCBC1 /* Logger.h */,
 				E7C0F8F81907F1C6001B7230 /* Main.storyboard */,
 				E7C0F8F51907F1C6001B7230 /* AppDelegate.h */,
 				E7C0F8F61907F1C6001B7230 /* AppDelegate.m */,
@@ -140,15 +169,6 @@
 				E7C0F8F41907F1C6001B7230 /* ExampleRecorder-Prefix.pch */,
 			);
 			name = "Supporting Files";
-			sourceTree = "<group>";
-		};
-		E7C0F92A190808C5001B7230 /* Vendor */ = {
-			isa = PBXGroup;
-			children = (
-				E7C0F92B190808D2001B7230 /* ASScreenRecorder.h */,
-				E7C0F92C190808D2001B7230 /* ASScreenRecorder.m */,
-			);
-			name = Vendor;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -195,9 +215,12 @@
 		E7C0F8DB1907F1C6001B7230 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0510;
+				LastUpgradeCheck = 0820;
 				ORGANIZATIONNAME = "Alan Skipp";
 				TargetAttributes = {
+					E7C0F8E21907F1C6001B7230 = {
+						DevelopmentTeam = XD9DMGBJLW;
+					};
 					E7C0F9061907F1C7001B7230 = {
 						TestTargetID = E7C0F8E21907F1C6001B7230;
 					};
@@ -247,10 +270,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CDC6F2781E7B8CD9002CCBC1 /* ASScreenRecordManager.m in Sources */,
+				CDC6F2771E7B8CD9002CCBC1 /* ASScreenRecorder.m in Sources */,
 				E7C0F8F71907F1C6001B7230 /* AppDelegate.m in Sources */,
-				E7C0F92D190808D2001B7230 /* ASScreenRecorder.m in Sources */,
 				E7C0F8FD1907F1C6001B7230 /* MasterViewController.m in Sources */,
 				E7C0F8F31907F1C6001B7230 /* main.m in Sources */,
+				CDC6F2791E7B8CD9002CCBC1 /* RecorderManager.mm in Sources */,
 				E7C0F93019081312001B7230 /* UIViewController+ScreenRecorder.m in Sources */,
 				E7C0F9001907F1C6001B7230 /* DetailViewController.m in Sources */,
 			);
@@ -306,13 +331,19 @@
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
@@ -325,7 +356,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 7.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
 			};
@@ -344,20 +375,25 @@
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = YES;
 				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNDECLARED_SELECTOR = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 7.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				SDKROOT = iphoneos;
 				VALIDATE_PRODUCT = YES;
 			};
@@ -368,9 +404,11 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				DEVELOPMENT_TEAM = XD9DMGBJLW;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "ExampleRecorder/ExampleRecorder-Prefix.pch";
 				INFOPLIST_FILE = "ExampleRecorder/ExampleRecorder-Info.plist";
+				PRODUCT_BUNDLE_IDENTIFIER = "alan-skipp.ExampleRecorder123";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
 			};
@@ -381,9 +419,11 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				DEVELOPMENT_TEAM = XD9DMGBJLW;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "ExampleRecorder/ExampleRecorder-Prefix.pch";
 				INFOPLIST_FILE = "ExampleRecorder/ExampleRecorder-Info.plist";
+				PRODUCT_BUNDLE_IDENTIFIER = "alan-skipp.ExampleRecorder123";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
 			};
@@ -448,6 +488,7 @@
 				E7C0F91A1907F1C7001B7230 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		E7C0F91B1907F1C7001B7230 /* Build configuration list for PBXNativeTarget "ExampleRecorderTests" */ = {
 			isa = XCConfigurationList;
@@ -456,6 +497,7 @@
 				E7C0F91D1907F1C7001B7230 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
