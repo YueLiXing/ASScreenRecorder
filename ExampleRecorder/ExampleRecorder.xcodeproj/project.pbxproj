@@ -410,6 +410,7 @@
 				INFOPLIST_FILE = "ExampleRecorder/ExampleRecorder-Info.plist";
 				PRODUCT_BUNDLE_IDENTIFIER = "alan-skipp.ExampleRecorder123";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				TARGETED_DEVICE_FAMILY = "1,2";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -425,6 +426,7 @@
 				INFOPLIST_FILE = "ExampleRecorder/ExampleRecorder-Info.plist";
 				PRODUCT_BUNDLE_IDENTIFIER = "alan-skipp.ExampleRecorder123";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				TARGETED_DEVICE_FAMILY = "1,2";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;

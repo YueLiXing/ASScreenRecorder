@@ -101,14 +101,16 @@
 //    self.lastPath = RecorderPath(fileName);
     
     if (self.recorder) {
-        [self.recorder stop];
-        [self.recorder deleteRecording];
+        if (self.recorder.isRecording) {
+            [self.recorder stop];
+            [self.recorder deleteRecording];
+        }
         self.recorder.delegate = nil;
         self.recorder = nil;
     }
     
     NSError * error;
-    NSLog(@"path : %@", self.lastPath);
+//    NSLog(@"path : %@", self.lastPath);
     if ([[NSFileManager defaultManager] fileExistsAtPath:self.lastPath]) {
         NSError * tempError = nil;
         [[NSFileManager defaultManager] removeItemAtPath:self.lastPath error:&tempError];

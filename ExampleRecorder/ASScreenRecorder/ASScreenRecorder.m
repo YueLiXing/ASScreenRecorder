@@ -95,6 +95,8 @@
         dispatch_set_target_queue(_render_queue, dispatch_get_global_queue( DISPATCH_QUEUE_PRIORITY_HIGH, 0));
         _frameRenderingSemaphore = dispatch_semaphore_create(1);
         _pixelAppendSemaphore = dispatch_semaphore_create(1);
+        
+//        self.count = 0;
     }
     return self;
 }
@@ -116,7 +118,10 @@
         _displayLink = [CADisplayLink displayLinkWithTarget:self selector:@selector(writeVideoFrame)];
         [_displayLink addToRunLoop:[NSRunLoop mainRunLoop] forMode:NSRunLoopCommonModes];
         self.audioPath = nil;
-        [[RecorderManager shareManager] startRecordVolumeChange:nil TimeChange:nil];
+//        if (self.count == 0) {
+            [[RecorderManager shareManager] startRecordVolumeChange:nil TimeChange:nil];
+//        }
+//        self.count += 1 ;
     }
     return _isRecording;
 }
@@ -126,14 +131,20 @@
     if (_isRecording) {
         [self.displayLink invalidate];
         self.displayLink = nil;
-        [[RecorderManager shareManager] endRecord:^(NSString *filaPath, NSInteger sec) {
-            self.audioPath = filaPath;
-            LxLog(@"%@", filaPath);
+        if ([RecorderManager shareManager].recorder.isRecording) {
+            [[RecorderManager shareManager] endRecord:^(NSString *filaPath, NSInteger sec) {
+                self.audioPath = filaPath;
+                LxLog(@"%@", filaPath);
+                _isRecording = NO;
+                
+                [_displayLink removeFromRunLoop:[NSRunLoop mainRunLoop] forMode:NSRunLoopCommonModes];
+                [self completeRecordingSession:completionBlock];
+            }];
+        } else {
             _isRecording = NO;
-            
             [_displayLink removeFromRunLoop:[NSRunLoop mainRunLoop] forMode:NSRunLoopCommonModes];
             [self completeRecordingSession:completionBlock];
-        }];
+        }
     }
 }
 
@@ -242,13 +253,13 @@
                 };
                 LxLog(@"开始融合视频和音频");
                 
-//                [self mergeVideo:_videoWriter.outputURL.absoluteString andAudio:self.audioPath ExportPath:self.videoURL Compltion:^{
+                [self mergeVideo:_videoWriter.outputURL.absoluteString andAudio:self.audioPath ExportPath:self.videoURL Compltion:^{
                     LxLog(@"删除缓存视频文件和音频文件");
                     [self removeTempFilePath:self.tempFilePath];
                     [self removeTempFilePath:_videoWriter.outputURL.path];
                     [self removeTempFilePath:self.audioPath];
                     dispatch_async(dispatch_get_main_queue(), completion);
-//                }];
+                }];
                 
 //                [self mergeVideo:_videoWriter.outputURL.absoluteString andAudio:self.audioPath Compltion:^(NSString * exportPath) {
 //                    ALAssetsLibrary *library = [[ALAssetsLibrary alloc] init];
@@ -371,18 +382,21 @@
     AVURLAsset* audioAsset = [[AVURLAsset alloc]initWithURL:audioUrl options:nil];
     AVURLAsset* videoAsset = [[AVURLAsset alloc]initWithURL:videoUrl options:nil];
     
-    //混合音乐
+    
     AVMutableComposition* mixComposition = [AVMutableComposition composition];
-    AVMutableCompositionTrack *compositionCommentaryTrack = [mixComposition addMutableTrackWithMediaType:AVMediaTypeAudio
-                                                                                        preferredTrackID:kCMPersistentTrackID_Invalid];
+    //混合音乐
+    AVMutableCompositionTrack *compositionCommentaryTrack =
+        [mixComposition addMutableTrackWithMediaType:AVMediaTypeAudio
+                                    preferredTrackID:kCMPersistentTrackID_Invalid];
     [compositionCommentaryTrack insertTimeRange:CMTimeRangeMake(kCMTimeZero, audioAsset.duration)
                                         ofTrack:[[audioAsset tracksWithMediaType:AVMediaTypeAudio] objectAtIndex:0]
                                          atTime:kCMTimeZero error:nil];
     
     
     //混合视频
-    AVMutableCompositionTrack *compositionVideoTrack = [mixComposition addMutableTrackWithMediaType:AVMediaTypeVideo
-                                                                                   preferredTrackID:kCMPersistentTrackID_Invalid];
+    AVMutableCompositionTrack *compositionVideoTrack =
+        [mixComposition addMutableTrackWithMediaType:AVMediaTypeVideo
+                                    preferredTrackID:kCMPersistentTrackID_Invalid];
     [compositionVideoTrack insertTimeRange:CMTimeRangeMake(kCMTimeZero, videoAsset.duration)
                                    ofTrack:[[videoAsset tracksWithMediaType:AVMediaTypeVideo] objectAtIndex:0]
                                     atTime:kCMTimeZero error:nil];

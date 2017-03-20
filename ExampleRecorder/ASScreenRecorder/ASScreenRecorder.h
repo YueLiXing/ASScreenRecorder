@@ -28,6 +28,9 @@ typedef void (^VideoCompletionBlock)(void);
 - (void)stopRecordingWithCompletion:(VideoCompletionBlock)completionBlock;
 // 检查音频权限
 - (void)checkAudioAuth:(void (^)(BOOL granted))handler;
+
+//@property (nonatomic, assign) NSInteger count;
+
 @end
 
 
