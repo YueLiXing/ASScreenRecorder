@@ -15,7 +15,7 @@
 
 @property (nonatomic, assign) BOOL isDebug;
 
-
+@property (nonatomic, copy) NSString * filePath;
 
 @end
 
@@ -51,9 +51,9 @@
     if (self.isDebug) {
         return;
     }
-    NSString * filePath = [self.cachePath stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.mp4", fileName]];
+    self.filePath = [self.cachePath stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.mp4", fileName]];
     
-    self.recorder.videoURL = [NSURL fileURLWithPath:filePath];
+    self.recorder.videoURL = [NSURL fileURLWithPath:self.filePath];
     [self.recorder startRecording];
 }
 
@@ -64,6 +64,7 @@
     if (self.recorder) {
         [self.recorder stopRecordingWithCompletion:^{
             LxLog(@"录制完成");
+            UISaveVideoAtPathToSavedPhotosAlbum(self.filePath, nil, nil, nil);
             if (completion) {
                 completion(self.recorder.videoURL);
             }
